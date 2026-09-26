@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 
+from app.core.config import settings
+from app.routers.health import router as health_router
+
 app = FastAPI(
-    title="Auth Service API",
+    title=settings.app_name,
     description="API для регистрации и авторизации пользователей",
     version="0.1.0",
 )
 
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+app.include_router(health_router)
