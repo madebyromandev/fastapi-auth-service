@@ -13,3 +13,16 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: Literal["bearer"] = "bearer"
+
+
+class TokenPairResponse(TokenResponse):
+    refresh_token: str
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: SecretStr = Field(
+        min_length=1,
+        max_length=2048,
+    )
+
+    model_config = ConfigDict(hide_input_in_errors=True)

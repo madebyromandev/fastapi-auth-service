@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from jwt.exceptions import InvalidTokenError
+from uuid import uuid4
+from hashlib import sha256
+from typing import Any
 
 import jwt
 from pwdlib import PasswordHash
@@ -56,6 +59,53 @@ def get_user_id_from_access_token(token: str) -> int | None:
             return None
 
         return user_id
+
+    except (InvalidTokenError, ValueError, TypeError):
+        return None
+
+def create_refresh_token(user_id: int) -> str:
+    now = datetime.now(timezone.utc)
+
+    payload = {
+        "sub": str(user_id),
+        "type": "refresh",
+        "jti": str(uuid4()),
+        "iat": now,
+        "exp": now + timedelta(
+            days=settings.jwt_refresh_token_expire_days
+        ),
+    }
+
+    return jwt.encode(
+        payload,
+        settings.jwt_secret_key.get_secret_value(),
+        algorithm=JWT_ALGORITHM,
+    )
+
+def hash_refresh_token(token: str) -> str:
+    return sha256(token.encode("utf-8")).hexdigest()
+
+def decode_refresh_token(token: str) -> dict[str, Any] | None:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret_key.get_secret_value(),
+            algorithms=[JWT_ALGORITHM],
+            options={
+                "require": ["sub", "type", "jti", "iat", "exp"]
+            },
+        )
+
+        if payload["type"] != "refresh":
+            return None
+
+        if int(payload["sub"]) <= 0:
+            return None
+
+        if not isinstance(payload["jti"], str) or not payload["jti"]:
+            return None
+
+        return payload
 
     except (InvalidTokenError, ValueError, TypeError):
         return None

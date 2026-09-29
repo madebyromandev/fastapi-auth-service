@@ -5,6 +5,7 @@ from alembic import context
 from app.core.database import database_url, engine
 from app.models.base import Base
 from app.models.user import User
+from app.models.refresh_token import RefreshToken
 
 
 config = context.config
