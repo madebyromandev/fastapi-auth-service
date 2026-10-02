@@ -8,6 +8,10 @@ Backend-сервис регистрации и аутентификации по
 
 [Открыть Swagger UI](https://fastapi-auth-service-production-0cc1.up.railway.app/docs)
 
+## Скриншот API
+
+![Swagger UI — Auth Service API](screenshots/swagger.png)
+
 ## Возможности
 
 - Регистрация пользователей с проверкой уникальности email.
